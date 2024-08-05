@@ -12,6 +12,11 @@ services:
     volumes:
       - charlie_data:/opt/data
     restart: always
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -zv localhost 22"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         reservations:
@@ -28,6 +33,11 @@ services:
       conti-test:
         ipv4_address: 172.16.100.141
     restart: always
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -zv localhost 22"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -51,6 +61,11 @@ services:
       CONTI_ENV: ${CONTI_ENV:-prod}
       CONTI_DB_NAME: ${CONTI_DB_NAME}
     restart: always
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -zv localhost 22"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     deploy:
       resources:
         reservations:
