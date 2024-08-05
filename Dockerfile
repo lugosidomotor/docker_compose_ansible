@@ -18,8 +18,18 @@ COPY ssh/ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key
 COPY ssh/ssh_host_rsa_key.pub /etc/ssh/ssh_host_rsa_key.pub
 COPY ssh/sshd_config /etc/ssh/sshd_config
 
+# Add the public key for ansible user
+RUN mkdir -p /home/ansible/.ssh \
+    && chmod 700 /home/ansible/.ssh \
+    && touch /home/ansible/.ssh/authorized_keys \
+    && chmod 600 /home/ansible/.ssh/authorized_keys \
+    && chown -R ansible:ansible /home/ansible/.ssh
+
+COPY ssh/ansible_key.pub /home/ansible/.ssh/authorized_keys
+
 # Set correct permissions for SSH keys
-RUN chmod 600 /etc/ssh/ssh_host_rsa_key
+RUN chmod 600 /etc/ssh/ssh_host_rsa_key \
+    && chmod 644 /etc/ssh/ssh_host_rsa_key.pub
 
 COPY init/run.sh /usr/local/bin/run.sh
 RUN chmod +x /usr/local/bin/run.sh
