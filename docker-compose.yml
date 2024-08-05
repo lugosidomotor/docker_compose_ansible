@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  alpha:
+    build: .
+    container_name: alpha
+    hostname: alpha
+    networks:
+      conti-test:
+        ipv4_address: 172.16.100.140
+
+  bravo:
+    build: .
+    container_name: bravo
+    hostname: bravo
+    networks:
+      conti-test:
+        ipv4_address: 172.16.100.141
+    depends_on:
+      - alpha
+
+  charlie:
+    build: .
+    container_name: charlie
+    hostname: charlie
+    networks:
+      conti-test:
+        ipv4_address: 172.16.100.142
+    volumes:
+      - ./data:/opt/data
+    depends_on:
+      - bravo
+    environment:
+      - CONTI_ENV=${CONTI_ENV:-prod}
+      - CONTI_DB_NAME=${CONTI_DB_NAME}
+
+networks:
+  conti-test:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.100.128/26
