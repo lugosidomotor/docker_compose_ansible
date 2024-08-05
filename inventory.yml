@@ -2,11 +2,11 @@ all:
   children:
     east:
       hosts:
-        alpha:
-        bravo:
+        172.16.100.140:  # alpha
+        172.16.100.141:  # bravo
     west:
       hosts:
-        charlie:
+        172.16.100.142:  # charlie
 
 vars:
   ansible_user: ansible
