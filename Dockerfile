@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 
 RUN apt-get update && \
-    apt-get install -y openssh-server sudo && \
+    apt-get install -y openssh-server sudo netcat && \
     mkdir /var/run/sshd
 
 # Create ansible user with specified UID and GID
