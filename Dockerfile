@@ -1,43 +1,20 @@
+# Dockerfile
 FROM ubuntu:20.04
 
-RUN apt-get update && apt-get install -y \
-    sudo \
-    openssh-server \
-    tini \
-    && rm -rf /var/lib/apt/lists/*
+# Create ansible user with specified UID and GID
+RUN groupadd -g 71000 ansible && \
+    useradd -m -u 71000 -g ansible ansible && \
+    echo "ansible ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-# Add ansible user
-RUN useradd -m -u 71000 -s /bin/bash ansible \
-    && echo 'ansible ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+# Install OpenSSH server
+RUN apt-get update && \
+    apt-get install -y openssh-server && \
+    mkdir /var/run/sshd
 
-# Setup SSH server
-RUN mkdir /var/run/sshd
-RUN echo 'PasswordAuthentication no' >> /etc/ssh/sshd_config
-RUN echo 'PermitRootLogin no' >> /etc/ssh/sshd_config
-RUN echo 'AllowUsers ansible' >> /etc/ssh/sshd_config
+# Copy the SSH key for the ansible user
+COPY id_rsa.pub /home/ansible/.ssh/authorized_keys
+RUN chown ansible:ansible /home/ansible/.ssh/authorized_keys && \
+    chmod 600 /home/ansible/.ssh/authorized_keys
 
-# Copy SSH keys
-COPY ssh/ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key
-COPY ssh/ssh_host_rsa_key.pub /etc/ssh/ssh_host_rsa_key.pub
-COPY ssh/sshd_config /etc/ssh/sshd_config
-
-# Add the public key for ansible user
-RUN mkdir -p /home/ansible/.ssh \
-    && chmod 700 /home/ansible/.ssh \
-    && touch /home/ansible/.ssh/authorized_keys \
-    && chmod 600 /home/ansible/.ssh/authorized_keys \
-    && chown -R ansible:ansible /home/ansible/.ssh
-
-COPY ssh/ansible_key.pub /home/ansible/.ssh/authorized_keys
-
-# Set correct permissions for SSH keys
-RUN chmod 600 /etc/ssh/ssh_host_rsa_key \
-    && chmod 644 /etc/ssh/ssh_host_rsa_key.pub
-
-# Copy init script
-COPY init/run.sh /usr/local/bin/run.sh
-RUN chmod +x /usr/local/bin/run.sh
-
-EXPOSE 22
-ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["/usr/local/bin/run.sh"]
+# Start the SSH service
+CMD ["/usr/sbin/sshd", "-D"]

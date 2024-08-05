@@ -1,11 +1,10 @@
 .PHONY: up ansible
 
 up:
-	@if [ -z "$$CONTI_DB_NAME" ]; then \
-		echo "You must specify CONTI_DB_NAME in the environment."; \
-		exit 1; \
-	fi
-	docker-compose up -d --build
+ifndef CONTI_DB_NAME
+  $(error You must specify CONTI_DB_NAME in the environment)
+endif
+docker-compose up -d --build --force-recreate --no-deps --order-dependencies alpha bravo charlie
 
 ansible:
-	ansible-playbook -i ./ansible/inventory.ini ./ansible/playbook.yml
+ansible-playbook -i inventory.yml playbook.yml

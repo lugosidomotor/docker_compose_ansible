@@ -1,0 +1,26 @@
+- hosts: east
+  tasks:
+    - name: Set login message for east group
+      lineinfile:
+        path: /etc/motd
+        line: "Eastern promises."
+
+- hosts: west  
+  tasks:
+    - name: Set login message for west group
+      lineinfile:
+        path: /etc/motd
+        line: "Once upon a time in the west."
+
+- hosts: all
+  tasks:
+    - name: Set timezone
+      timezone:
+        name: "{{ timezone }}"
+
+    - name: Configure APT mirror
+      lineinfile:
+        path: /etc/apt/sources.list
+        regexp: '^deb '
+        line: "deb {{ apt_mirror }} {{ ansible_distribution_release }} main restricted universe multiverse"
+        state: present
