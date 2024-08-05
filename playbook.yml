@@ -1,16 +1,20 @@
 - hosts: east
+  become: yes
   tasks:
     - name: Set login message for east group
       lineinfile:
         path: /etc/motd
         line: "Eastern promises."
+        create: yes
 
-- hosts: west  
+- hosts: west
+  become: yes
   tasks:
     - name: Set login message for west group
       lineinfile:
         path: /etc/motd
         line: "Once upon a time in the west."
+        create: yes
 
 - hosts: all
   tasks:

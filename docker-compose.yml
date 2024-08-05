@@ -12,7 +12,13 @@ services:
     volumes:
       - charlie_data:/opt/data
     restart: always
-
+    deploy:
+      resources:
+        reservations:
+          memory: 256M
+        limits:
+          memory: 512M
+          
   bravo:
     build: .
     image: conti-test
@@ -22,6 +28,14 @@ services:
       conti-test:
         ipv4_address: 172.16.100.141
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 4G
+    depends_on:
+      alpha:
+        condition: service_healthy
 
   charlie:
     build: .
@@ -37,6 +51,15 @@ services:
       CONTI_ENV: ${CONTI_ENV:-prod}
       CONTI_DB_NAME: ${CONTI_DB_NAME}
     restart: always
+    deploy:
+      resources:
+        reservations:
+          memory: 512M
+        limits:
+          memory: 1G
+    depends_on:
+      bravo:
+        condition: service_healthy
 
 networks:
   conti-test:
