@@ -17,6 +17,9 @@
         create: yes
 
 - hosts: all
+  become: yes
+  vars_files:
+    - vars.yml
   tasks:
     - name: Set timezone
       timezone:
