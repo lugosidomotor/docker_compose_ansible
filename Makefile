@@ -8,4 +8,4 @@ up:
 	docker-compose up -d --build
 
 ansible:
-	ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
+	ansible-playbook -i ./ansible/inventory.ini ./ansible/playbook.yml
